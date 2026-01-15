@@ -1,0 +1,327 @@
+<!-- 
+  RECOMMENDED FILENAME: index.html
+  DIRECTIONS FOR VS CODE / CHROME:
+  1. Save this as index.html.
+  2. Right-click the file and "Open with Google Chrome".
+  3. If the graph still doesn't appear, ensure you are connected to the internet 
+     so the Chart.js and Tailwind CDN links can load.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive Decision Support System (EDSS)</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .brand-teal { color: #0d9488; }
+        .bg-brand-teal { background-color: #0d9488; }
+        .bg-muted-coral { background-color: #fb7185; }
+        
+        /* Modern range slider styling */
+        input[type=range]::-webkit-slider-thumb {
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #0d9488;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -6px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: #e2e8f0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800">
+
+    <div class="flex h-screen">
+        <!-- Persistent Navigation Rail -->
+        <nav class="w-20 bg-slate-900 flex flex-col items-center py-6 space-y-8 shadow-xl shrink-0">
+            <div class="p-3 bg-teal-500 rounded-xl text-white font-bold text-xs">EDSS</div>
+            <button title="Executive Summary" class="text-teal-500">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+            </button>
+            <button title="Product Deep Dive" class="text-slate-400 hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+            </button>
+            <button title="Regional Trends" class="text-slate-400 hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            </button>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <!-- Dynamic Header -->
+            <header class="bg-white border-b px-8 py-4 flex justify-between items-center shadow-sm z-10">
+                <div>
+                    <h1 id="dynamic-title" class="text-2xl font-bold text-slate-900">Sales Performance for All Regions</h1>
+                    <p class="text-slate-500 text-xs font-medium uppercase tracking-tight">Executive Vision: Transforming DRIP to Insights</p>
+                </div>
+                <div class="flex space-x-3">
+                    <button id="save-btn" class="px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition flex items-center text-sm font-semibold">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                        Save Strategy
+                    </button>
+                    <button onclick="window.print()" class="px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition text-sm font-semibold">Export PDF</button>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-8 space-y-8">
+                <!-- KPI Row -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                        <span class="text-slate-400 text-xs font-bold uppercase tracking-widest">Budgeted / Actual Profit</span>
+                        <div id="actual-profit" class="text-3xl font-black mt-2 brand-teal">$0</div>
+                        <div class="mt-2 text-xs text-slate-400">Baseline Performance</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                        <span class="text-slate-400 text-xs font-bold uppercase tracking-widest">Simulated Profit</span>
+                        <div id="simulated-profit" class="text-3xl font-black mt-2 text-slate-900">$0</div>
+                        <div class="mt-2 text-xs text-slate-400">Parameter: Price Sensitivity</div>
+                    </div>
+                    <div class="bg-teal-50 p-6 rounded-2xl border border-teal-100 flex flex-col justify-between">
+                        <span class="text-teal-700 text-xs font-bold uppercase tracking-widest">Decision Impact</span>
+                        <div id="net-impact" class="text-3xl font-black mt-2 text-teal-600">+$0</div>
+                        <div class="mt-2 text-xs text-teal-600 font-medium">Profit Opportunity Identified</div>
+                    </div>
+                </div>
+
+                <!-- Main Analysis Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Controls Panel -->
+                    <div class="lg:col-span-1 space-y-6">
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                            <h3 class="font-bold text-slate-800 mb-6 flex items-center justify-between">
+                                Simulation Engine
+                                <span class="group relative">
+                                    <svg class="w-4 h-4 text-slate-300 cursor-help" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-48 p-2 bg-slate-800 text-white text-[10px] rounded shadow-lg z-20">
+                                        Adjust filters to move from "What Happened" to "What If".
+                                    </div>
+                                </span>
+                            </h3>
+                            
+                            <div class="space-y-8">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-400 uppercase mb-3">Filter: Regional Context</label>
+                                    <select id="region-select" class="w-full border-slate-200 border p-2.5 rounded-xl bg-slate-50 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none transition-all">
+                                        <option value="All Regions">All Regions</option>
+                                        <option value="North">North</option>
+                                        <option value="South">South</option>
+                                        <option value="East">East</option>
+                                        <option value="West">West</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between mb-3">
+                                        <label class="text-xs font-bold text-slate-400 uppercase">Variable: Price Increase</label>
+                                        <span id="price-val" class="text-sm font-bold text-teal-600">0%</span>
+                                    </div>
+                                    <input id="price-slider" type="range" min="0" max="20" value="0" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                                    <div class="flex justify-between text-[10px] text-slate-400 mt-2 font-medium">
+                                        <span>CONSERVATIVE</span>
+                                        <span>AGGRESSIVE (20%)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Insight Card -->
+                        <div class="bg-slate-900 p-6 rounded-2xl text-white shadow-lg relative overflow-hidden">
+                            <div class="absolute -right-4 -top-4 w-24 h-24 bg-teal-500/10 rounded-full"></div>
+                            <h3 class="font-bold text-teal-400 mb-3 text-sm">Dynamic Intelligence Logic</h3>
+                            <p class="text-xs text-slate-400 leading-relaxed">
+                                This simulation applies variable price elasticity logic across selected segments. 
+                                <br><br>
+                                <code class="bg-slate-800 text-teal-300 px-2 py-1 rounded block text-center font-mono mt-2">
+                                    Impact = (Rev * (1+Δ)) - Cost
+                                </code>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Visualization Panel -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 h-full flex flex-col min-h-[450px]">
+                            <div class="flex justify-between items-center mb-8">
+                                <h3 class="font-bold text-slate-800">The Bridge Graphic: Profit Variance</h3>
+                                <div class="flex items-center space-x-4">
+                                    <div class="flex items-center space-x-1">
+                                        <div class="w-3 h-3 rounded-sm bg-brand-teal"></div>
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase">Baseline</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <div class="w-3 h-3 rounded-sm bg-muted-coral"></div>
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase">Impact</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex-1 relative">
+                                <canvas id="bridgeChart"></canvas>
+                            </div>
+                            
+                            <div class="mt-6 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                                <p class="text-[11px] text-slate-500 leading-relaxed">
+                                    <strong>Consultant Insight:</strong> The waterfall bridge isolates the "Price Leak" vs the "Simulation Gain". 
+                                    By adjusting the price increase, you are directly impacting the top-line without increasing operational overhead.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-8 right-8 bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-2xl hidden z-50 flex items-center border border-slate-700">
+        <svg class="w-4 h-4 mr-2 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        Scenario Saved
+    </div>
+
+    <!-- Main Logic Script (No-Module Version for better Chrome Local Support) -->
+    <script>
+        // --- DATA MODEL (Star Schema Mock) ---
+        const salesData = [
+            { region: 'North', revenue: 500000, cost: 300000 },
+            { region: 'South', revenue: 450000, cost: 280000 },
+            { region: 'East', revenue: 600000, cost: 350000 },
+            { region: 'West', revenue: 550000, cost: 320000 }
+        ];
+
+        let selectedRegion = 'All Regions';
+        let priceIncrease = 0;
+        let chartInstance = null;
+
+        // --- CALCULATION LOGIC ---
+        function calculateMetrics() {
+            let filtered = salesData;
+            if (selectedRegion !== 'All Regions') {
+                filtered = salesData.filter(d => d.region === selectedRegion);
+            }
+
+            const totalRev = filtered.reduce((acc, curr) => acc + curr.revenue, 0);
+            const totalCost = filtered.reduce((acc, curr) => acc + curr.cost, 0);
+            
+            // Impact Measure Formula: Simulated Profit = SUM(Rev) * (1 + %) - SUM(Cost)
+            const actualProfit = totalRev - totalCost;
+            const simulatedRev = totalRev * (1 + (priceIncrease / 100));
+            const simulatedProfit = simulatedRev - totalCost;
+
+            return {
+                title: `Sales Performance for ${selectedRegion}`,
+                actual: actualProfit,
+                simulated: simulatedProfit,
+                variance: simulatedProfit - actualProfit
+            };
+        }
+
+        // --- UI UPDATE LOGIC ---
+        function updateUI() {
+            const metrics = calculateMetrics();
+            
+            // Update Text
+            document.getElementById('dynamic-title').innerText = metrics.title;
+            document.getElementById('actual-profit').innerText = '$' + metrics.actual.toLocaleString();
+            document.getElementById('simulated-profit').innerText = '$' + metrics.simulated.toLocaleString();
+            document.getElementById('net-impact').innerText = '+$' + Math.round(metrics.variance).toLocaleString();
+            
+            // Update Graph
+            renderChart(metrics);
+        }
+
+        function renderChart(metrics) {
+            const ctx = document.getElementById('bridgeChart');
+            if (!ctx) return;
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Actual Profit', 'Decision Impact', 'Simulated Profit'],
+                    datasets: [{
+                        data: [metrics.actual, metrics.variance, metrics.simulated],
+                        backgroundColor: ['#0d9488', '#fb7185', '#0f766e'],
+                        borderRadius: 8,
+                        barPercentage: 0.6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { display: false },
+                            ticks: {
+                                callback: (v) => '$' + v.toLocaleString()
+                            }
+                        },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (item) => '$' + item.raw.toLocaleString()
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = () => {
+            updateUI();
+
+            // Listeners
+            document.getElementById('region-select').addEventListener('change', (e) => {
+                selectedRegion = e.target.value;
+                updateUI();
+            });
+
+            document.getElementById('price-slider').addEventListener('input', (e) => {
+                priceIncrease = parseInt(e.target.value);
+                document.getElementById('price-val').innerText = priceIncrease + '%';
+                updateUI();
+            });
+
+            document.getElementById('save-btn').addEventListener('click', () => {
+                // In local Chrome (no server), we just show a toast
+                showToast("Strategy Saved Locally");
+                console.log("Saved State:", { selectedRegion, priceIncrease });
+            });
+        };
+    </script>
+</body>
+</html>
