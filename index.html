@@ -1,29 +1,17 @@
-<!-- 
-  RECOMMENDED FILENAME: index.html
-  DIRECTIONS FOR VS CODE / CHROME:
-  1. Save this as index.html.
-  2. Right-click the file and "Open with Google Chrome".
-  3. If the graph still doesn't appear, ensure you are connected to the internet 
-     so the Chart.js and Tailwind CDN links can load.
--->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Executive Decision Support System (EDSS)</title>
-    
-    <!-- External Libraries -->
-    <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         .brand-teal { color: #0d9488; }
         .bg-brand-teal { background-color: #0d9488; }
         .bg-muted-coral { background-color: #fb7185; }
-        
-        /* Modern range slider styling */
-        input[type=range]::-webkit-slider-thumb {
+                input[type=range]::-webkit-slider-thumb {
             height: 20px;
             width: 20px;
             border-radius: 50%;
@@ -52,7 +40,6 @@
 <body class="bg-slate-50 font-sans text-slate-800">
 
     <div class="flex h-screen">
-        <!-- Persistent Navigation Rail -->
         <nav class="w-20 bg-slate-900 flex flex-col items-center py-6 space-y-8 shadow-xl shrink-0">
             <div class="p-3 bg-teal-500 rounded-xl text-white font-bold text-xs">EDSS</div>
             <button title="Executive Summary" class="text-teal-500">
@@ -65,10 +52,7 @@
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
             </button>
         </nav>
-
-        <!-- Main Content Area -->
         <main class="flex-1 flex flex-col overflow-hidden">
-            <!-- Dynamic Header -->
             <header class="bg-white border-b px-8 py-4 flex justify-between items-center shadow-sm z-10">
                 <div>
                     <h1 id="dynamic-title" class="text-2xl font-bold text-slate-900">Sales Performance for All Regions</h1>
@@ -84,7 +68,6 @@
             </header>
 
             <div class="flex-1 overflow-y-auto p-8 space-y-8">
-                <!-- KPI Row -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
                         <span class="text-slate-400 text-xs font-bold uppercase tracking-widest">Budgeted / Actual Profit</span>
@@ -102,10 +85,7 @@
                         <div class="mt-2 text-xs text-teal-600 font-medium">Profit Opportunity Identified</div>
                     </div>
                 </div>
-
-                <!-- Main Analysis Grid -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <!-- Controls Panel -->
                     <div class="lg:col-span-1 space-y-6">
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                             <h3 class="font-bold text-slate-800 mb-6 flex items-center justify-between">
@@ -144,7 +124,6 @@
                             </div>
                         </div>
 
-                        <!-- Insight Card -->
                         <div class="bg-slate-900 p-6 rounded-2xl text-white shadow-lg relative overflow-hidden">
                             <div class="absolute -right-4 -top-4 w-24 h-24 bg-teal-500/10 rounded-full"></div>
                             <h3 class="font-bold text-teal-400 mb-3 text-sm">Dynamic Intelligence Logic</h3>
@@ -157,8 +136,6 @@
                             </p>
                         </div>
                     </div>
-
-                    <!-- Visualization Panel -->
                     <div class="lg:col-span-2">
                         <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 h-full flex flex-col min-h-[450px]">
                             <div class="flex justify-between items-center mb-8">
@@ -191,16 +168,11 @@
             </div>
         </main>
     </div>
-
-    <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-8 right-8 bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-2xl hidden z-50 flex items-center border border-slate-700">
         <svg class="w-4 h-4 mr-2 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
         Scenario Saved
     </div>
-
-    <!-- Main Logic Script (No-Module Version for better Chrome Local Support) -->
     <script>
-        // --- DATA MODEL (Star Schema Mock) ---
         const salesData = [
             { region: 'North', revenue: 500000, cost: 300000 },
             { region: 'South', revenue: 450000, cost: 280000 },
@@ -211,8 +183,6 @@
         let selectedRegion = 'All Regions';
         let priceIncrease = 0;
         let chartInstance = null;
-
-        // --- CALCULATION LOGIC ---
         function calculateMetrics() {
             let filtered = salesData;
             if (selectedRegion !== 'All Regions') {
@@ -235,17 +205,13 @@
             };
         }
 
-        // --- UI UPDATE LOGIC ---
         function updateUI() {
             const metrics = calculateMetrics();
-            
-            // Update Text
-            document.getElementById('dynamic-title').innerText = metrics.title;
+                        document.getElementById('dynamic-title').innerText = metrics.title;
             document.getElementById('actual-profit').innerText = '$' + metrics.actual.toLocaleString();
             document.getElementById('simulated-profit').innerText = '$' + metrics.simulated.toLocaleString();
             document.getElementById('net-impact').innerText = '+$' + Math.round(metrics.variance).toLocaleString();
             
-            // Update Graph
             renderChart(metrics);
         }
 
@@ -300,11 +266,8 @@
             setTimeout(() => toast.classList.add('hidden'), 3000);
         }
 
-        // --- INITIALIZATION ---
         window.onload = () => {
             updateUI();
-
-            // Listeners
             document.getElementById('region-select').addEventListener('change', (e) => {
                 selectedRegion = e.target.value;
                 updateUI();
@@ -317,11 +280,11 @@
             });
 
             document.getElementById('save-btn').addEventListener('click', () => {
-                // In local Chrome (no server), we just show a toast
                 showToast("Strategy Saved Locally");
                 console.log("Saved State:", { selectedRegion, priceIncrease });
             });
         };
     </script>
 </body>
+
 </html>
